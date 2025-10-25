@@ -3,6 +3,9 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 const db = require('./db');
+const jwt = require('jsonwebtoken');
+const secret_key = "raman";
+
 // email with register
 app.post('/register-email', (request, response) => {
     const { name, email, phone, password } = request.body;
@@ -29,17 +32,27 @@ app.post('/register-email', (request, response) => {
 
 app.post('/login-email', (request, response) => {
 
-    const sql = "SELECT * FROM students WHERE phone=? AND password=?";
-    const { phone, password } = request.body;
-    console.log("s" + phone + "pass" + password);
-    db.query(sql, [phone, password], (error, result) => {
+    const sql = "SELECT * FROM students WHERE email=? AND password=?";
+    const { email, password } = request.body;
+    console.log("s" + email + "pass" + password);
+    db.query(sql, [email, password], (error, result) => {
         const student = result[0];
+
+        const token = jwt.sign(
+            { id: student.id, email: student.email, password: student.password },
+            secret_key,
+            { expiresIn: "1h" }
+        );
+
         if (error) throw error;
         response.json({
-            message: "login successfully", student: {
+            message: "login successfully",
+            token: token,
+            student: {
                 name: student.name, email: student.email, phone: student.phone
 
             }
+
         });
     })
 })
