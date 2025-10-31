@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
-const port = 3000;
+const port = process.env.port || 3000;
 const db = require('./db');
 const jwt = require('jsonwebtoken');
 const secret_key = "raman";
